@@ -1,0 +1,19 @@
+# deps
+node_modules/
+
+# runtime state — NEVER commit (WhatsApp session creds + local data)
+auth/
+auth*/
+data.db
+data.db-*
+*.sqlite
+
+# secrets & logs
+.env
+.env.*
+!.env.example
+*.log
+run.log
+
+# os
+.DS_Store

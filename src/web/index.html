@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WhatsApp Groupchat Moderator</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+</head>
+<body>
+
+  <!-- ================= AUTH ================= -->
+  <div id="auth" class="fullscreen">
+    <div class="auth-card">
+      <div class="brand-lg"><i data-lucide="bot-message-square"></i> WPBot</div>
+      <p class="brand-tag">WhatsApp groupchat moderator</p>
+      <h1 id="authTitle">Create your account</h1>
+      <input id="authUser" placeholder="Username" autocomplete="username" />
+      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password" />
+      <input id="authPass2" type="password" placeholder="Confirm password" autocomplete="new-password" />
+      <button class="primary block" id="authBtn">Continue</button>
+      <p class="err hidden" id="authErr"></p>
+    </div>
+  </div>
+
+  <!-- ================= ONBOARDING WIZARD ================= -->
+  <div id="wizard" class="fullscreen hidden">
+    <div class="wiz-card">
+      <div class="stepper" id="stepper">
+        <div class="step" data-i="0"><span class="dot">1</span><label>Connect</label></div>
+        <div class="step" data-i="1"><span class="dot">2</span><label>Groups</label></div>
+        <div class="step" data-i="2"><span class="dot">3</span><label>Rules</label></div>
+        <div class="step" data-i="3"><span class="dot">4</span><label>AI</label></div>
+      </div>
+
+      <!-- step 0: connect -->
+      <div class="wiz-panel active" data-panel="0">
+        <h2>Link your WhatsApp</h2>
+        <p class="muted">Open WhatsApp → Linked devices → Link a device, then scan.</p>
+        <div id="wizQr" class="qr"><div class="spinner"></div></div>
+      </div>
+
+      <!-- step 1: groups -->
+      <div class="wiz-panel" data-panel="1">
+        <h2>Choose groups to watch</h2>
+        <p class="muted">Pick at least one. You can change this later.</p>
+        <div id="wizGroups" class="list"></div>
+      </div>
+
+      <!-- step 2: rules -->
+      <div class="wiz-panel" data-panel="2">
+        <h2>What should your agent do?</h2>
+        <p class="muted">Pick one or more. You can add others later.</p>
+        <div class="choice-grid">
+          <button class="choice" data-rule="moderator">
+            <i data-lucide="shield-check"></i>
+            <b>Spam Moderator</b>
+            <span class="muted">Auto-removes spam, scams & links.</span>
+          </button>
+          <button class="choice" data-rule="gatekeeper">
+            <i data-lucide="user-check"></i>
+            <b>Gatekeeper</b>
+            <span class="muted">Approves joiners, removes rule-breakers.</span>
+          </button>
+          <button class="choice" data-rule="digest">
+            <i data-lucide="sunset"></i>
+            <b>Daily Digest</b>
+            <span class="muted">One evening recap across your groups.</span>
+          </button>
+        </div>
+        <div id="wizDigestTime" class="hidden">
+          <label>Send it to me at</label>
+          <input id="wizTime" value="20:00" />
+        </div>
+      </div>
+
+      <!-- step 3: ai -->
+      <div class="wiz-panel" data-panel="3">
+        <h2>Connect your AI</h2>
+        <p class="muted">Choose a provider and paste your key. We'll test it.</p>
+        <div id="wizProvider"></div>
+      </div>
+
+      <div class="wiz-nav">
+        <button id="wizBack" class="ghost">Back</button>
+        <div class="wiz-nav-right">
+          <button id="wizSkip" class="link">Skip</button>
+          <button id="wizNext" class="primary">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP ================= -->
+  <div id="app" class="hidden">
+    <nav id="nav">
+      <div class="brand"><i data-lucide="bot-message-square"></i> <span>WPBot</span></div>
+      <button data-tab="connect" class="active" id="nav-connect"><i data-lucide="qr-code"></i><span>Connect</span></button>
+      <button data-tab="groups" id="nav-groups"><i data-lucide="users"></i><span>Groups</span></button>
+      <button data-tab="bots" id="nav-bots"><i data-lucide="bot"></i><span>Agents</span></button>
+      <button data-tab="activity" id="nav-activity"><i data-lucide="list"></i><span>Activity</span></button>
+      <button data-tab="settings" id="nav-settings"><i data-lucide="settings"></i><span>Settings</span></button>
+      <div class="nav-spacer"></div>
+      <button id="tourBtn" class="nav-min"><i data-lucide="help-circle"></i><span>Tour</span></button>
+      <button id="logoutBtn" class="nav-min"><i data-lucide="log-out"></i><span>Sign out</span></button>
+    </nav>
+
+    <main>
+      <!-- CONNECT -->
+      <section id="connect" class="tab active">
+        <div class="center">
+          <div id="qrBox" class="qr"><div class="spinner"></div></div>
+          <h1 id="connectTitle">Link your WhatsApp</h1>
+          <p class="muted" id="connectHint">Open WhatsApp → Linked devices → scan this code.</p>
+        </div>
+      </section>
+
+      <!-- GROUPS -->
+      <section id="groups" class="tab">
+        <h1>Groups</h1>
+        <p class="muted">Pick the groups WPBot should watch.</p>
+        <div id="groupList" class="list"></div>
+      </section>
+
+      <!-- AGENTS -->
+      <section id="bots" class="tab">
+        <div class="row-between">
+          <h1>Agents</h1>
+          <button class="primary" id="addBotBtn"><i data-lucide="plus"></i> New agent</button>
+        </div>
+        <p class="muted" style="margin-top:2px">Start from a template or build your own — each agent is a prompt + tools + when it runs.</p>
+        <div class="prebuilt">
+          <button class="card" data-prebuilt="moderator">
+            <i data-lucide="shield-check"></i><b>Spam Moderator</b>
+            <span class="muted">Deletes spam, removes repeat offenders.</span>
+          </button>
+          <button class="card" data-prebuilt="gatekeeper">
+            <i data-lucide="user-check"></i><b>Gatekeeper</b>
+            <span class="muted">Approves joiners, rejects spam accounts.</span>
+          </button>
+          <button class="card" data-prebuilt="assistant">
+            <i data-lucide="sparkles"></i><b>Group Assistant</b>
+            <span class="muted">Answers when someone @mentions it.</span>
+          </button>
+          <button class="card" data-prebuilt="digest">
+            <i data-lucide="sunset"></i><b>Daily Digest</b>
+            <span class="muted">Evening recap, sent to you.</span>
+          </button>
+        </div>
+        <div id="botList" class="list"></div>
+      </section>
+
+      <!-- ACTIVITY -->
+      <section id="activity" class="tab">
+        <h1>Activity</h1>
+        <div class="subtabs">
+          <button class="active" data-sub="actions">Moderation</button>
+          <button data-sub="digests">Recaps</button>
+        </div>
+        <div id="activityList" class="list"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" class="tab">
+        <h1>Settings</h1>
+        <div class="section">
+          <h3>AI provider</h3>
+          <p class="muted">Add one or more providers. Each agent picks which model to use — models load from the provider, nothing is preset.</p>
+          <div id="setProvider"></div>
+        </div>
+        <div class="section">
+          <h3>Connection</h3>
+          <p class="muted" id="connState">—</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- agent builder sheet -->
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-inner">
+      <div class="row-between"><h2 id="sheetTitle">New agent</h2><button id="sheetClose" class="icon-btn"><i data-lucide="x"></i></button></div>
+
+      <label>What should it do?</label>
+      <textarea id="agentPrompt" rows="3" placeholder="e.g. If someone posts spam or a scam link, delete it and tell them why it's not allowed."></textarea>
+
+      <label>Model</label>
+      <select id="agentModel"></select>
+
+      <label>Tools it can use</label>
+      <div id="agentTools" class="chips"></div>
+      <p class="muted note" id="toolsNote">Give it only the actions it needs. Deleting/removing needs the linked number to be a group admin.</p>
+
+      <label>When it runs</label>
+      <select id="agentTrigger">
+        <option value="message">On risky messages · cheap</option>
+        <option value="message-all">On every message · more tokens</option>
+        <option value="mention">When someone @mentions it</option>
+        <option value="join">On a join request</option>
+        <option value="schedule">On a schedule</option>
+      </select>
+
+      <div id="scheduleOpts" class="hidden">
+        <div class="two">
+          <div><label>Time</label><input id="agentTime" value="20:00" /></div>
+          <div><label>Send it to</label><select id="agentTarget"></select></div>
+        </div>
+      </div>
+
+      <label>Groups</label>
+      <select id="agentScope">
+        <option value="global">All monitored groups</option>
+        <option value="group">One group</option>
+      </select>
+      <select id="agentGroup" class="hidden"></select>
+
+      <button class="primary" id="saveBot"><i data-lucide="check"></i> Turn on</button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
