@@ -45,12 +45,27 @@ Skip them all and set your AI provider from **Settings** in the app after deploy
 
 ## Connect
 
-1. Open your app URL and **create your account** (first visit lets you choose a username + password).
+Open your app URL and **create your account** (first visit lets you choose a username + password), then the setup wizard walks you through four steps:
 
-   ![Sign up](images/signup.png)
+**1. Connect** — scan the QR with your burner number (WhatsApp → **Linked devices** → **Link a device**).
 
-2. On **Connect**, scan the QR with your burner number: WhatsApp → **Linked devices** → **Link a device**.
-3. Pick your groups, turn on **Spam Moderator**, **Gatekeeper**, and/or **Daily Digest**. Done.
+![Connect](images/onboarding-connect.png)
+
+**2. Choose groups** — toggle on the groups WPBot should watch. It never touches a group you didn't switch on.
+
+![Choose groups](images/onboarding-groups.png)
+
+**3. Add agents** — pick Spam Moderator, Gatekeeper, and/or Daily Digest. Each is a template you can tweak.
+
+![Add agents](images/onboarding-rules.png)
+
+**4. Connect AI** — choose a provider and paste a key; models are fetched live from the provider (nothing hardcoded). You can skip and set this in **Settings** later.
+
+![Connect AI](images/onboarding-ai.png)
+
+Every agent can run across **all monitored groups** or be scoped to **one group** — and you pick exactly which tools it may use (reply, delete, remove, approve/reject joiners):
+
+![Agent builder](images/agent-builder.png)
 
 ## Keeping the session alive
 
