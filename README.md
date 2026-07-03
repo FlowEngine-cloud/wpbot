@@ -3,8 +3,8 @@
 <p align="center">Keeps your groups clean, and tells everyone what mattered.</p>
 
 <p align="center">
-  <a href="docs/DEPLOY_FLOWENGINE.md">
-    <img src="https://img.shields.io/badge/Deploy%20on-FlowEngine-111827?style=for-the-badge&logo=rocket" alt="Deploy on FlowEngine" />
+  <a href="https://flowengine.cloud/deploy/wpbot">
+    <img src="https://flowengine.cloud/button.svg" alt="Deploy on FlowEngine" height="40">
   </a>
 </p>
 
@@ -58,9 +58,9 @@ Open the dashboard, create your account, scan the QR. Done.
 
 ## Deploy on FlowEngine
 
-WhatsApp needs an always-on connection — a laptop that sleeps won't cut it. [**Deploy on FlowEngine**](docs/DEPLOY_FLOWENGINE.md) and it stays up 24/7, auto-restarts, and uses FlowEngine's built-in AI gateway so you don't even need a separate AI key.
+WhatsApp needs an always-on connection — a laptop that sleeps won't cut it. [**Deploy on FlowEngine**](https://flowengine.cloud/deploy/wpbot) and it stays up 24/7, auto-restarts, and pairs to your phone by QR right in the app. Set your AI in Settings — any OpenAI-compatible key, or your FlowEngine gateway key.
 
-<a href="docs/DEPLOY_FLOWENGINE.md"><img src="https://img.shields.io/badge/Deploy%20on-FlowEngine-111827?style=for-the-badge&logo=rocket" alt="Deploy on FlowEngine" /></a>
+<a href="https://flowengine.cloud/deploy/wpbot"><img src="https://flowengine.cloud/button.svg" alt="Deploy on FlowEngine" height="40"></a>
 
 ## Good to know
 

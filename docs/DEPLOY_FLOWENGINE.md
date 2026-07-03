@@ -2,12 +2,10 @@
 <p align="center">Your WhatsApp Groupchat Moderator, always on.</p>
 
 <p align="center">
-  <a href="https://app.flowengine.io/deploy?template=wpbot">
-    <img src="https://img.shields.io/badge/Deploy%20on-FlowEngine-111827?style=for-the-badge&logo=rocket" alt="Deploy on FlowEngine" />
+  <a href="https://flowengine.cloud/deploy/wpbot">
+    <img src="https://flowengine.cloud/button.svg" alt="Deploy on FlowEngine" height="40">
   </a>
 </p>
-
-> Replace the button URL with your FlowEngine deploy link once the repo is connected.
 
 ---
 
@@ -17,7 +15,7 @@ WPBot holds a **live WhatsApp connection** — the moment it goes offline, moder
 
 - 🟢 **Always on** — runs as a persistent app, not a request/response function. The WhatsApp socket stays connected 24/7.
 - 🔁 **Auto-restart** — if the process crashes or the box reboots, FlowEngine brings it straight back and it reconnects.
-- 🤖 **Built-in AI** — point `AI_BASE_URL` at FlowEngine's LiteLLM gateway and you **don't need your own AI key**. Billing and models are handled for you.
+- 🤖 **Any AI provider** — set it in the app under **Settings**: paste an OpenAI-compatible key (or your FlowEngine gateway key). Models are fetched live from the provider, nothing is hardcoded.
 - 📜 **Logs & metrics** — see connection status, moderation actions, and errors from the FlowEngine dashboard.
 - 🔒 **Your data stays put** — messages live in the app's own SQLite volume and auto-expire. Nothing is shipped to a third party.
 
@@ -26,25 +24,24 @@ WPBot holds a **live WhatsApp connection** — the moment it goes offline, moder
 - A **dedicated WhatsApp number** (a burner — never your personal line). For the Gatekeeper's approve/remove to work, this number must be a **group admin**.
 - Your FlowEngine account.
 
-## Deploy in 3 steps
+## Deploy in 2 steps
 
-**1. Create the app.**
-In FlowEngine → **Hosting → New app → From Git**, point it at this repo. FlowEngine auto-detects Node and builds it (no Dockerfile needed).
+**1. Click Deploy on FlowEngine.**
+The [deploy page](https://flowengine.cloud/deploy/wpbot) creates your instance from the pre-built `flowenginecloud/wpbot:latest` image — no build step. All env vars below are optional.
 
-**2. Set environment variables.**
+**2. Deploy.**
+Hit deploy. When it's live, open the app URL and create your account.
+
+### Optional environment variables
 
 | Variable | Value |
 |---|---|
-| `ADMIN_PASSWORD` | a password for your dashboard |
-| `AI_BASE_URL` | your FlowEngine LiteLLM gateway URL (or leave blank and set the provider in the UI) |
-| `AI_API_KEY` | your gateway/provider key |
+| `AI_BASE_URL` | OpenAI-compatible endpoint to preconfigure (or leave blank and add it in **Settings**) |
+| `AI_API_KEY` | key for that endpoint |
 | `PORT` | `3000` |
 | `MESSAGE_TTL_HOURS` | `48` |
 
-You can skip the AI vars and configure the provider from **Settings** in the app later.
-
-**3. Deploy.**
-Hit deploy. When it's live, open the app URL.
+Skip them all and set your AI provider from **Settings** in the app after deploy.
 
 ## Connect
 
