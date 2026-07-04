@@ -4,7 +4,7 @@ import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import {
-  listGroups, setMonitored, listBots, insertBot, setBotEnabled, deleteBot,
+  listGroups, setMonitored, listBots, insertBot, updateBot, setBotEnabled, deleteBot,
   listActions, listDigests, getSetting, setSetting,
   countUsers, getUserByName, insertUser, insertSession, getSession, deleteSession,
   listProviders, insertProvider, deleteProvider,
@@ -130,6 +130,24 @@ export async function startServer(transport) {
       model: b.model || null,
       provider_id: b.provider_id || null,
       enabled: 1,
+    })
+    return { ok: true }
+  })
+  app.put('/api/bots/:id', async (req) => {
+    const b = req.body || {}
+    updateBot.run({
+      id: Number(req.params.id),
+      name: b.name || 'Agent',
+      prompt: b.prompt || null,
+      tools: JSON.stringify(Array.isArray(b.tools) ? b.tools : []),
+      trigger: b.trigger || 'message',
+      gate: b.gate || 'risky',
+      scope: b.scope || 'global',
+      group_jid: b.group_jid || null,
+      schedule: b.schedule || null,
+      target: b.target || null,
+      model: b.model || null,
+      provider_id: b.provider_id || null,
     })
     return { ok: true }
   })

@@ -148,6 +148,12 @@ export const insertBot = db.prepare(
    VALUES (@name, @prompt, @tools, @trigger, @gate, @scope, @group_jid, @schedule, @target, @enabled, @model, @provider_id, 'agent')`
 )
 export const setBotEnabled = db.prepare(`UPDATE bots SET enabled = @enabled WHERE id = @id`)
+export const updateBot = db.prepare(
+  `UPDATE bots SET name=@name, prompt=@prompt, tools=@tools, trigger=@trigger, gate=@gate,
+     scope=@scope, group_jid=@group_jid, schedule=@schedule, target=@target,
+     model=@model, provider_id=@provider_id
+   WHERE id=@id`
+)
 export const deleteBot = db.prepare(`DELETE FROM bots WHERE id = @id`)
 export const markBotRan = db.prepare(`UPDATE bots SET last_run = @day WHERE id = @id`)
 // Agents that react to messages (message/mention triggers) in a given group.

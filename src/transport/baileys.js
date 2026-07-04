@@ -135,9 +135,20 @@ export function createBaileysTransport({ onMessage }) {
       return n ? `${n}@s.whatsapp.net` : null
     },
     deleteMessage: (jid, key) => sock.sendMessage(jid, { delete: key }),
-    // ---- member management (needs the linked number to be a group admin) ----
+    // React to a message with a single emoji.
+    react: (jid, key, emoji) => sock.sendMessage(jid, { react: { text: emoji || '👍', key } }),
+    // Send an image from a direct URL, with an optional caption.
+    sendImage: (jid, url, caption) => sock.sendMessage(jid, { image: { url }, caption: caption || undefined }),
+    // Create a poll (single choice).
+    sendPoll: (jid, name, values) =>
+      sock.sendMessage(jid, { poll: { name, values: (values || []).slice(0, 12), selectableCount: 1 } }),
+    // ---- member / group management (needs the linked number to be a group admin) ----
     removeParticipant: (jid, participant) =>
       sock.groupParticipantsUpdate(jid, [participant], 'remove'),
+    promoteParticipant: (jid, participant) =>
+      sock.groupParticipantsUpdate(jid, [participant], 'promote'),
+    // Lock the group so only admins can post (announcement) — or unlock it.
+    setAnnouncement: (jid, on) => sock.groupSettingUpdate(jid, on ? 'announcement' : 'not_announcement'),
     listJoinRequests: (jid) => sock.groupRequestParticipantsList(jid),
     approveJoinRequests: (jid, participants) =>
       sock.groupRequestParticipantsUpdate(jid, participants, 'approve'),

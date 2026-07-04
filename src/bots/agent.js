@@ -23,8 +23,13 @@ function agentCfg(a) {
 
 const DEFS = {
   send: { type: 'function', function: { name: 'send_message', description: 'Reply in the group with a message.', parameters: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] } } },
+  react: { type: 'function', function: { name: 'react_message', description: 'React to the triggering message with a single emoji (e.g. 👍 ✅ ⚠️).', parameters: { type: 'object', properties: { emoji: { type: 'string' } }, required: ['emoji'] } } },
+  image: { type: 'function', function: { name: 'send_image', description: 'Send an image to the group from a direct, public image URL, with an optional caption.', parameters: { type: 'object', properties: { url: { type: 'string' }, caption: { type: 'string' } }, required: ['url'] } } },
+  poll: { type: 'function', function: { name: 'send_poll', description: 'Create a single-choice poll in the group.', parameters: { type: 'object', properties: { question: { type: 'string' }, options: { type: 'array', items: { type: 'string' } } }, required: ['question', 'options'] } } },
   delete: { type: 'function', function: { name: 'delete_message', description: 'Delete the message that triggered this.', parameters: { type: 'object', properties: { reason: { type: 'string' } } } } },
   remove: { type: 'function', function: { name: 'remove_member', description: 'Remove the sender from the group.', parameters: { type: 'object', properties: { reason: { type: 'string' } } } } },
+  promote: { type: 'function', function: { name: 'promote_member', description: 'Make the sender a group admin.', parameters: { type: 'object', properties: { reason: { type: 'string' } } } } },
+  lock: { type: 'function', function: { name: 'set_group_lock', description: 'Lock the group so only admins can post (locked=true), or unlock it (locked=false).', parameters: { type: 'object', properties: { locked: { type: 'boolean' } }, required: ['locked'] } } },
   approve: { type: 'function', function: { name: 'approve_request', description: 'Approve the pending join request.', parameters: { type: 'object', properties: {} } } },
   reject: { type: 'function', function: { name: 'reject_request', description: 'Reject the pending join request.', parameters: { type: 'object', properties: {} } } },
 }
@@ -45,7 +50,7 @@ export async function runMessageAgents(msg, transport) {
     if (!msg.text && !msg.hasMedia) continue
     const cfg = agentCfg(a); if (!cfg) continue
     const tools = parseTools(a.tools)
-    const toolDefs = defsFor(tools, ['send', 'delete', 'remove'])
+    const toolDefs = defsFor(tools, ['send', 'react', 'image', 'poll', 'delete', 'remove', 'promote', 'lock'])
     const user =
       `Group message from ${msg.senderName || msg.sender}:\n"${msg.text || '[media]'}"\n\n` +
       (a.trigger === 'mention' ? 'They mentioned you — respond.' : 'Take an action only if your instructions call for it; otherwise do nothing.')
@@ -55,8 +60,13 @@ export async function runMessageAgents(msg, transport) {
     for (const call of res.calls) {
       try {
         if (call.name === 'send_message' && call.args.text) { await transport.sendText(msg.groupJid, call.args.text); log(msg.groupJid, a.name, call.args.text, 'replied', 'agent reply') }
+        else if (call.name === 'react_message' && call.args.emoji) { await transport.react(msg.groupJid, msg.key, call.args.emoji); log(msg.groupJid, a.name, call.args.emoji, 'reacted', 'agent reaction') }
+        else if (call.name === 'send_image' && call.args.url) { await transport.sendImage(msg.groupJid, call.args.url, call.args.caption); log(msg.groupJid, a.name, call.args.caption || call.args.url, 'sent image', 'agent image') }
+        else if (call.name === 'send_poll' && call.args.question) { await transport.sendPoll(msg.groupJid, call.args.question, (call.args.options || []).filter(Boolean)); log(msg.groupJid, a.name, call.args.question, 'created poll', 'agent poll') }
         else if (call.name === 'delete_message') { await transport.deleteMessage(msg.groupJid, msg.key); log(msg.groupJid, msg.senderName, msg.text, 'deleted', call.args.reason || 'against the rules') }
         else if (call.name === 'remove_member') { await transport.removeParticipant(msg.groupJid, msg.sender); log(msg.groupJid, msg.senderName, msg.text, 'removed', call.args.reason || 'removed by agent') }
+        else if (call.name === 'promote_member') { await transport.promoteParticipant(msg.groupJid, msg.sender); log(msg.groupJid, msg.senderName, msg.text, 'promoted', call.args.reason || 'promoted by agent') }
+        else if (call.name === 'set_group_lock') { const on = call.args.locked !== false; await transport.setAnnouncement(msg.groupJid, on); log(msg.groupJid, a.name, '', on ? 'locked group' : 'unlocked group', 'agent') }
       } catch { /* not admin / transient */ }
     }
     if (a.trigger === 'mention' && tools.includes('send') && res.text && !res.calls.some((c) => c.name === 'send_message')) {

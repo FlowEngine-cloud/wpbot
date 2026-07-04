@@ -261,10 +261,15 @@ async function loadGroups() {
 // ---- agent templates (just prefill the one agent form) ----
 const TOOLS = [
   { key: 'send', label: 'Send message' },
+  { key: 'react', label: 'React (emoji)' },
+  { key: 'image', label: 'Send image' },
+  { key: 'poll', label: 'Create poll' },
   { key: 'delete', label: 'Delete message' },
+  { key: 'remove', label: 'Remove member' },
+  { key: 'promote', label: 'Make admin' },
+  { key: 'lock', label: 'Lock group' },
   { key: 'approve', label: 'Approve joiners' },
   { key: 'reject', label: 'Reject joiners' },
-  { key: 'remove', label: 'Remove member' },
 ]
 const TEMPLATES = {
   moderator: { title: 'Spam Moderator', trigger: 'message', tools: ['delete', 'remove'],
@@ -294,12 +299,14 @@ async function loadBots() {
     row.innerHTML = `<div><div class="t">${esc(b.name || 'Agent')}</div><div class="s">${sub}</div></div>
       <div style="display:flex;gap:14px;align-items:center">
         <button class="toggle ${b.enabled ? 'on' : ''}"></button>
+        <button class="icon-btn edit"><i data-lucide="pencil"></i></button>
         <button class="icon-btn del"><i data-lucide="trash-2"></i></button>
       </div>`
     $('.toggle', row).addEventListener('click', async (e) => {
       const on = !e.target.classList.contains('on'); e.target.classList.toggle('on', on)
       await api(`/bots/${b.id}/toggle`, { method: 'POST', body: JSON.stringify({ enabled: on }) })
     })
+    $('.edit', row).addEventListener('click', () => openEditSheet(b))
     $('.del', row).addEventListener('click', async () => { await api(`/bots/${b.id}`, { method: 'DELETE' }); loadBots() })
     el.appendChild(row)
   })
@@ -307,9 +314,10 @@ async function loadBots() {
 }
 
 // ---- agent builder sheet ----
+let editingId = null
 $$('[data-prebuilt]').forEach((c) => c.addEventListener('click', () => openSheet(c.dataset.prebuilt)))
 $('#addBotBtn').addEventListener('click', () => openSheet('custom'))
-$('#sheetClose').addEventListener('click', () => $('#sheet').classList.add('hidden'))
+$('#sheetClose').addEventListener('click', () => { editingId = null; $('#sheet').classList.add('hidden') })
 $('#agentTrigger').addEventListener('change', updateTriggerUI)
 $('#agentScope').addEventListener('change', (e) => $('#agentGroup').classList.toggle('hidden', e.target.value !== 'group'))
 
@@ -320,26 +328,44 @@ function renderTools(selected) {
 const selectedTools = () => $$('#agentTools .chip.on').map((c) => c.dataset.tool)
 function updateTriggerUI() { $('#scheduleOpts').classList.toggle('hidden', $('#agentTrigger').value !== 'schedule') }
 
-async function openSheet(key) {
+// New agent from a template.
+function openSheet(key) {
   const t = TEMPLATES[key] || TEMPLATES.custom
-  $('#sheetTitle').textContent = t.title
-  $('#agentPrompt').value = t.prompt || ''
-  renderTools(t.tools || [])
-  $('#agentTrigger').value = t.trigger || 'message'
-  $('#agentTime').value = t.schedule || '20:00'
-  $('#agentScope').value = 'global'; $('#agentGroup').classList.add('hidden')
+  return showSheet({ title: t.title, prompt: t.prompt, tools: t.tools, triggerValue: t.trigger, schedule: t.schedule, target: t.target, scope: 'global' })
+}
+// Edit an existing agent (prefilled from its saved config).
+function openEditSheet(b) {
+  let tools = []; try { tools = JSON.parse(b.tools || '[]') } catch {}
+  const triggerValue = b.trigger === 'message' && b.gate === 'all' ? 'message-all' : (b.trigger || 'message')
+  return showSheet({
+    id: b.id, title: b.name || 'Agent', prompt: b.prompt || '', tools, triggerValue,
+    schedule: b.schedule, scope: b.scope || 'global', group_jid: b.group_jid, target: b.target,
+    modelChosen: b.provider_id && b.model ? `${b.provider_id}::${b.model}` : '',
+  })
+}
+async function showSheet(cfg) {
+  editingId = cfg.id || null
+  $('#sheetTitle').textContent = cfg.title
+  $('#agentPrompt').value = cfg.prompt || ''
+  renderTools(cfg.tools || [])
+  $('#agentTrigger').value = cfg.triggerValue || 'message'
+  $('#agentTime').value = cfg.schedule || '20:00'
+  $('#agentScope').value = cfg.scope || 'global'
+  $('#agentGroup').classList.toggle('hidden', (cfg.scope || 'global') !== 'group')
   updateTriggerUI()
   const groups = await api('/groups')
   const gopts = (Array.isArray(groups) ? groups : []).map((g) => `<option value="${g.jid}">${g.name || g.jid}</option>`).join('')
   $('#agentGroup').innerHTML = gopts
+  if (cfg.group_jid) $('#agentGroup').value = cfg.group_jid
   $('#agentTarget').innerHTML = `<option value="self">Me (my WhatsApp)</option>` + gopts
-  if (t.target) $('#agentTarget').value = t.target
-  // model dropdown from configured providers (real models only)
+  if (cfg.target) $('#agentTarget').value = cfg.target
+  // model dropdown from configured providers (real models only), preselecting the saved one
   const providers = await api('/providers')
   const provList = Array.isArray(providers) ? providers : []
   $('#agentModel').innerHTML = provList.length
-    ? providerModelOptions(provList)
+    ? providerModelOptions(provList, cfg.modelChosen)
     : `<option value="">No provider yet — add one in Settings</option>`
+  $('#saveBot').innerHTML = editingId ? '<i data-lucide="check"></i> Save changes' : '<i data-lucide="check"></i> Turn on'
   $('#sheet').classList.remove('hidden'); icons()
 }
 
@@ -349,7 +375,7 @@ $('#saveBot').addEventListener('click', async () => {
   const gate = tv === 'message-all' ? 'all' : 'risky'
   const scope = $('#agentScope').value
   const [pid, ...mrest] = ($('#agentModel').value || '').split('::')
-  await api('/bots', { method: 'POST', body: JSON.stringify({
+  const payload = {
     name: $('#sheetTitle').textContent,
     prompt: $('#agentPrompt').value || null,
     tools: selectedTools(),
@@ -359,7 +385,10 @@ $('#saveBot').addEventListener('click', async () => {
     target: trigger === 'schedule' ? $('#agentTarget').value : null,
     provider_id: pid ? Number(pid) : null,
     model: mrest.join('::') || null,
-  }) })
+  }
+  if (editingId) await api(`/bots/${editingId}`, { method: 'PUT', body: JSON.stringify(payload) })
+  else await api('/bots', { method: 'POST', body: JSON.stringify(payload) })
+  editingId = null
   $('#sheet').classList.add('hidden'); loadBots()
 })
 
