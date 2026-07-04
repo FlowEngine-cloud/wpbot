@@ -32,7 +32,7 @@ Scan a QR, pick your groups, choose what the bots do, connect your AI. That's it
 
 ## One agent = prompt + tools + trigger + groups
 
-Start from a template or build your own. Choose exactly which tools an agent may use (reply, delete, remove, approve/reject joiners), when it runs, and whether it covers **all monitored groups or just one**.
+Start from a template or build your own. Choose exactly which tools an agent may use — reply, react, send an image, run a poll, delete a message, remove a member, make admin, lock the group, approve/reject joiners — when it runs, and whether it covers **all monitored groups or just one**.
 
 ![Agent builder](docs/images/agent-builder.png)
 

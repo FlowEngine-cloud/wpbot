@@ -137,7 +137,7 @@ button { font-family: inherit; }
 .pv-result.bad { color: var(--err); }
 
 /* ===== main app ===== */
-#app { display: flex; min-height: 100vh; }
+#app { display: flex; height: 100vh; }
 #nav {
   width: 210px; border-right: 1px solid var(--line); padding: 22px 14px;
   display: flex; flex-direction: column; gap: 3px;
@@ -153,8 +153,11 @@ button { font-family: inherit; }
 #nav button.active { background: var(--soft); color: var(--ink); font-weight: 500; }
 .nav-spacer { flex: 1; }
 .nav-min { color: #9ca3af !important; font-size: 14px !important; }
+.repo-link { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; text-decoration: none; }
+.repo-link:hover { color: var(--ink); }
+.repo-link svg { width: 16px; height: 16px; }
 
-main { flex: 1; padding: 48px 32px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+main { flex: 1; min-height: 0; padding: 48px 32px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
 .tab { display: none; width: 100%; max-width: 720px; }
 .tab.active { display: block; }
 .section { padding: 22px 0; border-top: 1px solid var(--line); margin-top: 22px; }
