@@ -27,7 +27,7 @@ WPBot holds a **live WhatsApp connection** — the moment it goes offline, moder
 ## Deploy in 2 steps
 
 **1. Click Deploy on FlowEngine.**
-The [deploy page](https://flowengine.cloud/deploy/wpbot) creates your instance from the pre-built `ghcr.io/flowengine-cloud/wpbot:latest` image (built automatically by GitHub Actions — no Docker Hub needed). All env vars below are optional.
+The [deploy page](https://flowengine.cloud/deploy/wpbot) builds this repo's Dockerfile straight on the server (the repo is public, so it clones and builds on deploy — no registry, no Docker Hub, no image to host). All env vars below are optional.
 
 **2. Deploy.**
 Hit deploy. When it's live, open the app URL and create your account.
