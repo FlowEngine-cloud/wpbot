@@ -30,18 +30,15 @@ Scan a QR, pick your groups, choose what the bots do, connect your AI. That's it
 | ![Connect](docs/images/onboarding-connect.png) | ![Choose groups](docs/images/onboarding-groups.png) | ![Add agents](docs/images/onboarding-rules.png) | ![Connect AI](docs/images/onboarding-ai.png) |
 | Scan the QR with your number | Toggle the groups to watch | Pick the moderators to run | Paste any key — models load in |
 
-## One agent = prompt + tools + trigger + groups
+## Production-ready agents — you control the tools
 
-Start from a template or build your own. Choose exactly which tools an agent may use — reply, react, send an image, run a poll, delete a message, remove a member, make admin, lock the group, approve/reject joiners — when it runs, and whether it covers **all monitored groups or just one**.
+Build agents to moderate your groups. Give each only the tools it needs; every action is logged.
 
 ![Agent builder](docs/images/agent-builder.png)
 
-**Four moderators, ready to turn on:**
+**Available tools:** Send message · React · Send image · Create poll · Delete message · Remove member · Make admin · Lock group · Approve / reject joiners
 
-- **Spam Moderator** — reads new messages, deletes spam/scams/links, removes repeat offenders.
-- **Gatekeeper** — screens join requests, approves real people, rejects bot accounts.
-- **Group Assistant** — answers on-topic when a member @mentions it.
-- **Daily Digest** — an evening summary across all your groups: decisions, action items, open questions, links.
+Delete, remove, make-admin and lock need the linked number to be a group admin.
 
 ![Agents](docs/images/agents.png)
 
