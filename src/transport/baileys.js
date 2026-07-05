@@ -13,7 +13,7 @@ import { dirname, join } from 'path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // Per-instance WhatsApp session store. Two instances must NEVER share this dir,
 // or they fight over the same WhatsApp device session.
-const AUTH_DIR = process.env.AUTH_DIR || join(__dirname, '..', '..', 'auth')
+const AUTH_DIR = process.env.AUTH_DIR || join(process.env.DATA_DIR || join(__dirname, '..', '..'), 'auth')
 const logger = pino({ level: 'silent' })
 
 // Strip device/server suffix from a WhatsApp jid → bare id (phone or lid number).

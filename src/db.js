@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const db = new DatabaseSync(process.env.DB_PATH || join(__dirname, '..', 'data.db'))
+const db = new DatabaseSync(process.env.DB_PATH || join(process.env.DATA_DIR || join(__dirname, '..'), 'data.db'))
 db.exec('PRAGMA journal_mode = WAL')
 
 db.exec(`
