@@ -72,4 +72,4 @@ WhatsApp needs an always-on connection — a laptop that sleeps won't cut it. [*
 - **Uses a burner number.** WPBot rides WhatsApp Web (Baileys), which is against WhatsApp ToS. Use a dedicated number, never your personal line. Delete/remove/approve actions need that number to be a **group admin**.
 - **Your data stays yours.** Messages live in a local SQLite file and auto-delete after `MESSAGE_TTL_HOURS` (default 48).
 
-MIT licensed. Full build plan in [PLAN.md](PLAN.md).
+MIT licensed. See [LICENSE](LICENSE).

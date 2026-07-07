@@ -27,6 +27,8 @@ db.exec(`
     target     TEXT,                          -- where a 'send' goes: 'self' | group jid
     enabled    INTEGER DEFAULT 1,
     last_run   TEXT,                          -- 'YYYY-MM-DD' for schedule de-dupe
+    model      TEXT,
+    provider_id INTEGER,
     type       TEXT                           -- legacy template key (kept for back-compat)
   );
 
