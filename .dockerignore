@@ -1,0 +1,29 @@
+# git
+.git
+.github
+.gitignore
+
+# deps (reinstalled in the image)
+node_modules/
+
+# runtime state - NEVER bake into the image (WhatsApp session creds + local data)
+auth/
+auth*/
+data.db
+data.db-*
+*.sqlite
+
+# secrets & logs
+.env
+.env.*
+!.env.example
+*.log
+run.log
+
+# docs & assets not needed at runtime
+docs/
+README.md
+LICENSE
+
+# os
+.DS_Store

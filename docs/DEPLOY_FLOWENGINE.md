@@ -27,7 +27,7 @@ WPBot holds a **live WhatsApp connection** — the moment it goes offline, moder
 ## Deploy in 2 steps
 
 **1. Click Deploy on FlowEngine.**
-The [deploy page](https://flowengine.cloud/deploy/wpbot) builds this repo's Dockerfile straight on the server (the repo is public, so it clones and builds on deploy — no registry, no Docker Hub, no image to host). All env vars below are optional.
+The [deploy page](https://flowengine.cloud/deploy/wpbot) pulls the published image `ghcr.io/flowengine-cloud/wpbot:latest` from GitHub Container Registry. It is public, so there is nothing to log into and no build step on deploy. Every push to `main` republishes it. All env vars below are optional.
 
 **2. Deploy.**
 Hit deploy. When it's live, open the app URL and create your account.
@@ -39,6 +39,7 @@ Hit deploy. When it's live, open the app URL and create your account.
 | `AI_BASE_URL` | OpenAI-compatible endpoint to preconfigure (or leave blank and add it in **Settings**) |
 | `AI_API_KEY` | key for that endpoint |
 | `PORT` | `3000` |
+| `DATA_DIR` | `/data` - where the SQLite db and the WhatsApp session are written. FlowEngine sets this and mounts the persistent volume there. |
 | `MESSAGE_TTL_HOURS` | `48` |
 
 Skip them all and set your AI provider from **Settings** in the app after deploy.
@@ -69,7 +70,7 @@ Every agent can run across **all monitored groups** or be scoped to **one group*
 
 ## Keeping the session alive
 
-FlowEngine keeps the container running, and WPBot auto-reconnects on drops. The WhatsApp login (device credentials) is stored in the app's `auth/` volume — **enable a persistent volume** for `auth/` and `data.db` so a redeploy doesn't force you to re-scan the QR.
+FlowEngine keeps the container running, and WPBot auto-reconnects on drops. The WhatsApp login (device credentials) and the SQLite db both live under `DATA_DIR` (`/data`), so **keep the persistent volume mounted there** or a redeploy forces you to re-scan the QR.
 
 ## Scaling to many numbers
 

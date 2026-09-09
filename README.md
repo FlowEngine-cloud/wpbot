@@ -60,6 +60,16 @@ npm run dev               # → http://localhost:3000
 
 Open the dashboard, create your account (first visit lets you pick a username + password), scan the QR. Done.
 
+## Run with Docker
+
+```bash
+docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data ghcr.io/flowengine-cloud/wpbot:latest
+```
+
+`/data` holds the SQLite database and the WhatsApp session, so the volume is what stops it asking for a new QR scan after every restart.
+
+Optionally preload your AI with `-e AI_BASE_URL=... -e AI_API_KEY=...`, or skip it and set the provider in the app under **Settings**.
+
 ## Deploy on FlowEngine
 
 WhatsApp needs an always-on connection — a laptop that sleeps won't cut it. [**Deploy on FlowEngine**](https://flowengine.cloud/deploy/wpbot) and it stays up 24/7, auto-restarts, and pairs to your phone by QR right in the app. Set your AI in Settings — any OpenAI-compatible key, or your FlowEngine gateway key.
