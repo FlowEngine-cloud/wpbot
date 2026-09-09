@@ -27,7 +27,7 @@ WPBot holds a **live WhatsApp connection** — the moment it goes offline, moder
 ## Deploy in 2 steps
 
 **1. Click Deploy on FlowEngine.**
-The [deploy page](https://flowengine.cloud/deploy/wpbot) pulls the published image `ghcr.io/flowengine-cloud/wpbot:latest` from GitHub Container Registry. It is public, so there is nothing to log into and no build step on deploy. Every push to `main` republishes it. All env vars below are optional.
+The [deploy page](https://flowengine.cloud/deploy/wpbot) clones this public repo and builds its Dockerfile on the server, so there is no registry and no image to host. All env vars below are optional.
 
 **2. Deploy.**
 Hit deploy. When it's live, open the app URL and create your account.
@@ -75,3 +75,13 @@ FlowEngine keeps the container running, and WPBot auto-reconnects on drops. The 
 ## Scaling to many numbers
 
 One app = one WhatsApp number. To run WPBot for many clients, deploy one app per number, or swap the transport ([src/transport/](../src/transport/)) for a WAHA/Evolution adapter that manages multiple sessions. Product logic doesn't change.
+
+## Run it somewhere else
+
+Not using FlowEngine? Run the published image directly on any host:
+
+```bash
+docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data ghcr.io/flowengine-cloud/wpbot:latest
+```
+
+Keep `/data` mounted or the WhatsApp pairing is lost on restart.
