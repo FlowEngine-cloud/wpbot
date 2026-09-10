@@ -10,6 +10,18 @@
 
 ---
 
+## Quick start
+
+```bash
+docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
+```
+
+Open [http://localhost:3000](http://localhost:3000), then scan the QR.
+
+`/data` holds the SQLite database and the WhatsApp session, so the volume is what stops it asking for a new QR scan after every restart.
+
+---
+
 WPBot puts simple AI **agents** in your WhatsApp groups. Each agent is a **prompt + the tools it may use + when it runs**, pointed at **all your groups or just one**:
 
 - ✅ **Auto-clean spammers** — scams, phishing links and unsolicited ads gone in seconds
