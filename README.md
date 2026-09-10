@@ -13,12 +13,18 @@
 ## Quick start
 
 ```bash
-docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
+npx wpbot
 ```
 
 Open [http://localhost:3000](http://localhost:3000), then scan the QR.
 
-`/data` holds the SQLite database and the WhatsApp session, so the volume is what stops it asking for a new QR scan after every restart.
+Or with Docker:
+
+```bash
+docker run -d -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
+```
+
+Either way the SQLite database and the WhatsApp session live together - in `./wpbot-data` for npx, in the `/data` volume for Docker. Keep it and you never rescan the QR.
 
 ---
 

@@ -3,6 +3,16 @@
   "version": "0.1.0",
   "type": "module",
   "description": "WPBot - WhatsApp groupchat moderator. Keeps groups clean, tells everyone what mattered.",
+  "bin": {
+    "wpbot": "bin/wpbot.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "engines": {
+    "node": ">=22.5"
+  },
   "license": "MIT",
   "scripts": {
     "dev": "node src/index.js",

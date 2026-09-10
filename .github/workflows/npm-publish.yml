@@ -1,0 +1,47 @@
+# Publishing to npm is what turns the quick start into `npx wpbot`. Without it the
+# package is only reachable as `npx github:FlowEngine-cloud/wpbot`, which nobody
+# wants to type or remember.
+name: Publish to npm
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # The `secrets` context is NOT readable in a job-level `if:` - it evaluates
+      # to false there and skips the job silently. So the gate is a step output.
+      - id: creds
+        run: echo "enabled=${{ secrets.NPM_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        if: steps.creds.outputs.enabled == 'true'
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # No build step and no test script in this package, so `npm ci` would fail on
+      # a missing lockfile script rather than prove anything. What matters is that
+      # the published tarball actually starts, so run the bin with a doomed port and
+      # require it to get far enough to open its own data dir.
+      - name: Check the bin boots
+        if: steps.creds.outputs.enabled == 'true'
+        run: |
+          npm install --no-audit --no-fund
+          PORT=3999 node bin/wpbot.js > boot.log 2>&1 &
+          for i in $(seq 1 20); do
+            grep -q "Dashboard: http" boot.log && { echo "bin booted"; exit 0; }
+            sleep 1
+          done
+          echo "bin never printed its dashboard line"; cat boot.log; exit 1
+
+      - name: Publish
+        if: steps.creds.outputs.enabled == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
