@@ -63,8 +63,10 @@ Open the dashboard, create your account (first visit lets you pick a username + 
 ## Run with Docker
 
 ```bash
-docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data ghcr.io/flowengine-cloud/wpbot:latest
+docker run -d --name wpbot -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
 ```
+
+Open http://localhost:3000.
 
 `/data` holds the SQLite database and the WhatsApp session, so the volume is what stops it asking for a new QR scan after every restart.
 

@@ -30,11 +30,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # The `secrets` context can't be read in a job-level `if:`, so the gate
+      # has to live on the step itself instead of on the job.
+      - name: Check for Docker Hub credentials
+        id: creds
+        run: echo "enabled=${{ secrets.DOCKERHUB_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+
+      # GHCR is private, so the documented `docker pull` fails for every
+      # anonymous visitor on a public repo. Docker Hub is the copy people can
+      # actually pull. Skipped on a fork or before DOCKERHUB_TOKEN is set.
+      - name: Log in to Docker Hub
+        if: steps.creds.outputs.enabled == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME || 'flowenginecloud' }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          # When the Hub login above was skipped, this falls back to a second
+          # GHCR entry (never a blank line) so build-push-action isn't asked
+          # to push a tag to a registry it never logged into.
+          images: |
+            ghcr.io/${{ github.repository }}
+            ${{ steps.creds.outputs.enabled == 'true' && (vars.DOCKERHUB_REPO || 'flowenginecloud/wpbot') || format('ghcr.io/{0}', github.repository) }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
