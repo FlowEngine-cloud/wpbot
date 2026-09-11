@@ -13,18 +13,18 @@
 ## Quick start
 
 ```bash
-npx wpbot
+docker run -d -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
 ```
 
 Open [http://localhost:3000](http://localhost:3000), then scan the QR.
 
-Or with Docker:
+No Docker? Run it straight from source:
 
 ```bash
-docker run -d -p 3000:3000 -v wpbot-data:/data flowenginecloud/wpbot
+npx github:FlowEngine-cloud/wpbot
 ```
 
-Either way the SQLite database and the WhatsApp session live together - in `./wpbot-data` for npx, in the `/data` volume for Docker. Keep it and you never rescan the QR.
+Either way the SQLite database and the WhatsApp session live together - in the `/data` volume for Docker, in `./wpbot-data` for npx. Keep it and you never rescan the QR.
 
 ---
 
